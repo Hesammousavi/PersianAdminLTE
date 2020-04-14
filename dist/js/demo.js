@@ -53,7 +53,8 @@
       $main_header.addClass('navbar-light')
     }
 
-    $main_header.addClass(color)
+    $main_header.addClass(color);
+    setCookie('main_header_color', color + ' ' + nav_type,100);
   })
 
   $navbar_variants.append($navbar_variants_colors)
@@ -63,6 +64,7 @@
   var $checkbox_container = $('<div />', {
     'class': 'mb-4'
   })
+  var main_header_border = '';
   var $navbar_border = $('<input />', {
     type   : 'checkbox',
     value  : 1,
@@ -70,10 +72,13 @@
     'class': 'mr-1'
   }).on('click', function () {
     if ($(this).is(':checked')) {
-      $('.main-header').addClass('border-bottom')
+      $('.main-header').addClass('border-bottom');
+      main_header_border = 'border-bottom';
     } else {
-      $('.main-header').removeClass('border-bottom')
+      $('.main-header').removeClass('border-bottom');
+      main_header_border = '';
     }
+    setCookie('main_header_border', main_header_border,100);
   })
   $checkbox_container.append($navbar_border)
   $checkbox_container.append('<span>مرز نوار ناوبری</span>')
@@ -114,7 +119,8 @@
       $sidebar.removeClass(skin)
     })
 
-    $sidebar.addClass(sidebar_class)
+    $sidebar.addClass(sidebar_class);
+    setCookie('main_sidebar_color', sidebar_class,100);
   }))
 
   $container.append('<h6>نوار روشن</h6>')
@@ -130,7 +136,8 @@
       $sidebar.removeClass(skin)
     })
 
-    $sidebar.addClass(sidebar_class)
+    $sidebar.addClass(sidebar_class);
+    setCookie('main_sidebar_color', sidebar_class,100);
   }))
 
   var logo_skins = navbar_all_colors
@@ -146,6 +153,7 @@
     logo_skins.map(function (skin) {
       $logo.removeClass(skin)
     })
+    setCookie('logo_color', color,100);
   })
   $container.append(createSkinBlock(logo_skins, function () {
     var color = $(this).data('color')
@@ -153,7 +161,8 @@
     logo_skins.map(function (skin) {
       $logo.removeClass(skin)
     })
-    $logo.addClass(color)
+    $logo.addClass(color);
+    setCookie('logo_color', color,100);
   }).append($clear_btn))
 
   function createSkinBlock(colors, callback) {
@@ -218,6 +227,53 @@
         traverse(document.body);
     }
 
-  ConvertNumberToPersion()
+  ConvertNumberToPersion();
+
+  $('.sidebar-mini .main-header .nav-item').click(function () {
+    let sidebar_mini = $('.sidebar-mini');
+    let class_name = sidebar_mini.attr('class');
+    class_name = class_name.replace('sidebar-mini sans ', '');
+    if (class_name == 'sidebar-open') {
+      setCookie('sidebar_class', 'sidebar-collapse', 100);
+    } else {
+      setCookie('sidebar_class', 'sidebar-open', 100);
+    }
+  });
+
+  let _sidebar_class = checkCookie('sidebar_class') ? getCookie('sidebar_class') : 'sidebar-open';
+  let _main_header_color = checkCookie('main_header_color') ? getCookie('main_header_color') : 'navbar-dark bg-success';
+  let _main_header_border = checkCookie('main_header_border') ? getCookie('main_header_border') : 'border-bottom';
+  let _main_sidebar_color = checkCookie('main_sidebar_color') ? getCookie('main_sidebar_color') : 'sidebar-dark-info';
+  let _logo_color = checkCookie('logo_color') ? getCookie('logo_color') : 'bg-success';
+  if(_main_header_border == 'border-bottom') $('.control-sidebar input[type=checkbox]').attr('checked', true);
+  $('.main-header').addClass(_main_header_color).addClass(_main_header_border);
+  $('.main-sidebar').addClass(_main_sidebar_color);
+  $('.main-sidebar .brand-link').addClass(_logo_color);
+  $('.sidebar-mini').addClass(_sidebar_class);
 
 })(jQuery)
+
+function setCookie(cname, cvalue, exdays) {
+  let d = new Date();
+  d.setTime(d.getTime() + (exdays*24*60*60*1000));
+  let expires = "expires="+d.toUTCString();
+  document.cookie = cname + "=" + cvalue + "; " + expires+"; path=/";
+}
+function getCookie(cname) {
+  let name = cname + "=";
+  let ca = document.cookie.split(';');
+  for(let i=0; i<ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0)==' ') c = c.substring(1);
+    if (c.indexOf(name) == 0) return c.substring(name.length, c.length);
+  }
+  return "";
+}
+function checkCookie(cname) {
+  let check_cookie = getCookie(cname);
+  if(check_cookie == ""){
+    return false;
+  }
+  return true;
+}
+
